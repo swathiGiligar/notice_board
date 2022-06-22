@@ -37,21 +37,6 @@ class MyApp extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   fontSize: 20.0,
                 ))),
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Notice Board Home'),
-          ),
-          body: const Align(
-            alignment: Alignment.topLeft,
-            child: NoticeBoardHome(),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _placeNoticePopUp,
-            tooltip: 'Place a notice',
-            child: const Icon(Icons.add),
-          ),
-        ));
+        home: const NoticeBoardHome());
   }
-
-  void _placeNoticePopUp() {}
 }
