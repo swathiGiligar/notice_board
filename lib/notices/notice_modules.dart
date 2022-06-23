@@ -66,13 +66,4 @@ class Notices {
   void fillList(noticesData) {
     notices = List.from(noticesData);
   }
-
-  // static List<Notice> dummyData() {
-  //   // Notice notice1 = Notice();
-
-  //   // noticeData.add(notice1);
-  //   // noticeData.add(notice2);
-
-  //   return noticeData;
-  // }
 }
