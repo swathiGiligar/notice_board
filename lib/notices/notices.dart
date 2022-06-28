@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notice_board/add_notice/add_notice.dart';
 import 'package:notice_board/notices/notice_modules.dart';
 import 'package:notice_board/notices/notices_to.dart';
 
@@ -61,11 +62,49 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
       appBar: AppBar(
         title: const Text('Notice Board Home'),
       ),
+      drawer: renderDrawer(),
       body: Align(
         alignment: Alignment.topLeft,
         child: noticeList,
       ),
       floatingActionButton: setRefreshAction(),
+    );
+  }
+
+  Drawer renderDrawer() {
+    return Drawer(
+      child: ListView(
+        // Important: Remove any padding from the ListView.
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              // color: Color.fromRGBO(46, 125, 50, 1.0),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: const Text('Hello, USER',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+          ListTile(
+            title: const Text('Place A New Notice'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PlaceNewNotice()),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Your Notices'),
+            onTap: () {
+              // Update the state of the app.
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -99,8 +138,8 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
     ]);
   }
 
-  Center drawHeading(List<NoticeTransformer> noticesForDisplay, int index) =>
-      Center(child: noticesForDisplay[index].heading);
+  Row drawHeading(List<NoticeTransformer> noticesForDisplay, int index) =>
+      Row(children: [noticesForDisplay[index].heading]);
 
   Row drawPriceRow(List<NoticeTransformer> noticesForDisplay, int index) {
     return Row(children: [
