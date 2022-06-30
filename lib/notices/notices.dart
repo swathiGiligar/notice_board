@@ -88,14 +88,13 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
           ),
           ListTile(
             title: const Text('Place A New Notice'),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const PlaceNewNotice()),
-              ).then((value) => setState(() {}));
-
-              ;
+              );
+              setState(() {});
             },
           ),
           ListTile(
