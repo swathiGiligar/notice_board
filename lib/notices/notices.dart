@@ -93,7 +93,9 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const PlaceNewNotice()),
-              );
+              ).then((value) => setState(() {}));
+
+              ;
             },
           ),
           ListTile(

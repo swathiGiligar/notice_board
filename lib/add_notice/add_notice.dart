@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:notice_board/constants.dart' as constants;
+import 'package:notice_board/notices/notice_modules.dart';
+import 'package:notice_board/notices/notices.dart';
 
 class PlaceNewNotice extends StatefulWidget {
   const PlaceNewNotice({Key? key}) : super(key: key);
@@ -11,6 +16,27 @@ class PlaceNewNotice extends StatefulWidget {
 class _PlaceNewNoticeState extends State<PlaceNewNotice> {
   final _formKey = GlobalKey<FormState>();
   String? chosenValue;
+  Future<Notice>? _futureNotice;
+  bool isButtonPressed = false;
+
+  final headingController = TextEditingController();
+  final priceController = TextEditingController();
+  final areaLavel1Controller = TextEditingController();
+  final areaLevel2Controller = TextEditingController();
+  final contactController = TextEditingController();
+  final detailsController = TextEditingController();
+
+  @override
+  void dispose() {
+    headingController.dispose();
+    priceController.dispose();
+    areaLavel1Controller.dispose();
+    areaLevel2Controller.dispose();
+    contactController.dispose();
+    detailsController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +54,8 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
               children: <Widget>[
                 //HEADING
                 TextFormField(
+                  enabled: !isButtonPressed,
+                  controller: headingController,
                   decoration: const InputDecoration(
                       hintText: constants.headingHintText,
                       labelText: constants.headingLabel),
@@ -42,6 +70,8 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //PRICE
                 TextFormField(
+                  enabled: !isButtonPressed,
+                  controller: priceController,
                   maxLength: constants.priceMaxLength,
                   decoration: const InputDecoration(
                       hintText: constants.priceHintText,
@@ -50,6 +80,8 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //CATEGORY
                 DropdownButton<String>(
+                  disabledHint:
+                      Text(chosenValue ?? constants.categoryDefaultSelection),
                   value: chosenValue,
                   items: constants.categoryList
                       .map<DropdownMenuItem<String>>((String value) {
@@ -59,15 +91,19 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
                     );
                   }).toList(),
                   hint: const Text(constants.categoryHintText),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      chosenValue = newValue!;
-                    });
-                  },
+                  onChanged: !isButtonPressed
+                      ? (String? newValue) {
+                          setState(() {
+                            chosenValue = newValue!;
+                          });
+                        }
+                      : null,
                 ),
 
                 //AREA LEVEL 1
                 TextFormField(
+                  enabled: !isButtonPressed,
+                  controller: areaLavel1Controller,
                   maxLength: constants.areaLevel1MaxLength,
                   decoration: const InputDecoration(
                       hintText: constants.areaLevel1HintText,
@@ -82,6 +118,8 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //AREA LEVEL 2
                 TextFormField(
+                  enabled: !isButtonPressed,
+                  controller: areaLevel2Controller,
                   maxLength: constants.areaLevel2MaxLength,
                   decoration: const InputDecoration(
                       hintText: constants.areaLevel2HintText,
@@ -96,6 +134,8 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //CONTACT
                 TextFormField(
+                  enabled: !isButtonPressed,
+                  controller: contactController,
                   maxLength: constants.contactMaxLength,
                   decoration: const InputDecoration(
                       hintText: constants.contactHintText,
@@ -110,6 +150,8 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //DETAILS
                 TextFormField(
+                  enabled: !isButtonPressed,
+                  controller: detailsController,
                   maxLength: constants.detailsMaxLength,
                   decoration: const InputDecoration(
                       hintText: constants.detailsHintText,
@@ -119,24 +161,102 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Validate returns true if the form is valid, or false otherwise.
-                      if (_formKey.currentState!.validate()) {
-                        // If the form is valid, display a snackbar. In the real world,
-                        // you'd often call a server or save the information in a database.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Processing Data')),
-                        );
-                      }
-                    },
+                    onPressed: !isButtonPressed
+                        ? () {
+                            if (_formKey.currentState!.validate()) {
+                              String categoryValue = chosenValue ??
+                                  constants.categoryDefaultSelection;
+                              Notice newNotice = Notice(
+                                noticeId: '',
+                                heading: headingController.text,
+                                price: priceController.text,
+                                category: categoryValue,
+                                areaLavel1: areaLavel1Controller.text,
+                                areaLevel2: areaLevel2Controller.text,
+                                contact: contactController.text,
+                                details: detailsController.text,
+                              );
+                              _futureNotice = createNotice(newNotice);
+                              setState(() {
+                                isButtonPressed = true;
+                              });
+                            }
+                          }
+                        : null,
                     child: const Text('Submit'),
                   ),
                 ),
+                if (isButtonPressed) buildFutureBuilder(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Future<Notice> createNotice(Notice newNotice) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:8080/noticeBoard'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'heading': newNotice.heading,
+        'price': newNotice.price,
+        'category': newNotice.category,
+        'area_level_1': newNotice.areaLavel1,
+        'area_level_2': newNotice.areaLevel2,
+        'contact': newNotice.contact,
+        'details': newNotice.details,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return Notice.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to create Notice.');
+    }
+  }
+
+  FutureBuilder<Notice> buildFutureBuilder() {
+    return FutureBuilder<Notice>(
+      future: _futureNotice,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Column(
+            children: [
+              const Text('Notice Created Succcessfully!'),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NoticeBoardHome()),
+                    );
+                  },
+                  child: const Text('Go Back'))
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Column(
+            children: [
+              const Text('Notice Creation Failed. Please Try Again'),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NoticeBoardHome()),
+                    );
+                  },
+                  child: const Text('Go Back'))
+            ],
+          );
+        }
+
+        return const CircularProgressIndicator();
+      },
     );
   }
 }

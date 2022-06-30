@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 const priceDefaultMessage = "Contact for price.";
 const detailsDefaultMessage = "Contact for Details.";
 
@@ -17,6 +19,7 @@ const priceHintText = "Price/rate if applicable";
 //Category
 const categoryHintText = "Please choose a category";
 const categoryList = <String>['Perishable', 'Non-perishable'];
+const categoryDefaultSelection = 'Perishable';
 
 //Area Lavel 1
 const areaLevel1MaxLength = 20;
@@ -33,7 +36,8 @@ const areaLevel2NoInputError = "Please Enter Town/Village";
 //Contact
 const contactMaxLength = 100;
 const contactLabel = "Contact Details";
-const contactHintText = "Contact Details(Mobile/Phone/Email - all or any)";
+const contactHintText =
+    "Contact Details(Mobile/Phone/Email/Address - all or any)";
 const contactNoInputError = "Please Enter Contact Details";
 
 //Details
