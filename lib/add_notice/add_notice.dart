@@ -197,7 +197,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
   Future<Notice> createNotice(Notice newNotice) async {
     final response = await http.post(
-      Uri.parse('http://localhost:8080/noticeBoard'),
+      Uri.parse(constants.serverURL),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

@@ -3,6 +3,7 @@ import 'package:notice_board/notices/notice_modules.dart';
 import 'package:notice_board/constants.dart' as constants;
 
 class NoticeTransformer {
+  String noticeId = "";
   Text heading = const Text("");
   Text price = const Text("");
   Text category = const Text("");
@@ -12,6 +13,7 @@ class NoticeTransformer {
   Text details = const Text("");
 
   NoticeTransformer(Notice notice) {
+    noticeId = notice.noticeId;
     heading = Text(
       notice.heading,
       textAlign: TextAlign.center,

@@ -2,22 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:notice_board/add_notice/add_notice.dart';
 import 'package:notice_board/notices/notice_modules.dart';
 import 'package:notice_board/notices/notices_to.dart';
+import 'package:http/http.dart' as http;
+import 'package:notice_board/constants.dart' as constants;
 
 class _NoticeBoardHomeState extends State<NoticeBoardHome> {
-  late Future<List<Notice>> futureNoticesForDisplay;
+  // late Future<List<Notice>> futureNoticesForDisplay;
 
   @override
   void initState() {
     super.initState();
-    futureNoticesForDisplay = fetchNotices();
+    // futureNoticesForDisplay = fetchNotices();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Notice>>(
-      future: futureNoticesForDisplay,
+      future: fetchNotices(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
           return renderList(snapshot);
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
@@ -47,6 +50,7 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
                     drawPriceRow(noticesForDisplay, index),
                     drawDetailsRow(noticesForDisplay, index),
                     drawContactInfoRow(noticesForDisplay, index),
+                    drawOpButtons(noticesForDisplay, index)
                   ],
                 )),
           ],
@@ -112,7 +116,7 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
   FloatingActionButton setRefreshAction() {
     return FloatingActionButton(
       onPressed: () => setState(() {
-        futureNoticesForDisplay = fetchNotices();
+        // futureNoticesForDisplay = fetchNotices();
       }),
       tooltip: 'Refresh',
       child: const Icon(Icons.refresh),
@@ -126,6 +130,19 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       noticesForDisplay[index].contact
+    ]);
+  }
+
+  Row drawOpButtons(List<NoticeTransformer> noticesForDisplay, int index) {
+    return Row(children: [
+      ElevatedButton(
+          onPressed: () async {
+            await closeNotice(noticesForDisplay[index].noticeId);
+            setState(() {
+              // futureNoticesForDisplay = fetchNotices();
+            });
+          },
+          child: const Text("Close Notice"))
     ]);
   }
 
@@ -150,6 +167,11 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
       ),
       noticesForDisplay[index].price
     ]);
+  }
+
+  Future<void> closeNotice(String noticeId) async {
+    String patchUrl = '${constants.serverURL}/$noticeId';
+    http.patch(Uri.parse(patchUrl));
   }
 }
 

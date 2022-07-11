@@ -1,3 +1,5 @@
+const serverURL = "http://localhost:8080/noticeBoard";
+
 const priceDefaultMessage = "Contact for price.";
 const detailsDefaultMessage = "Contact for Details.";
 
