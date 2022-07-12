@@ -6,18 +6,18 @@ import 'package:http/http.dart' as http;
 import 'package:notice_board/constants.dart' as constants;
 
 class _NoticeBoardHomeState extends State<NoticeBoardHome> {
-  // late Future<List<Notice>> futureNoticesForDisplay;
+  late Future<List<Notice>> futureNoticesForDisplay;
 
   @override
   void initState() {
     super.initState();
-    // futureNoticesForDisplay = fetchNotices();
+    futureNoticesForDisplay = fetchNotices();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Notice>>(
-      future: fetchNotices(),
+      future: futureNoticesForDisplay,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
@@ -116,7 +116,7 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
   FloatingActionButton setRefreshAction() {
     return FloatingActionButton(
       onPressed: () => setState(() {
-        // futureNoticesForDisplay = fetchNotices();
+        futureNoticesForDisplay = fetchNotices();
       }),
       tooltip: 'Refresh',
       child: const Icon(Icons.refresh),
@@ -137,10 +137,31 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
     return Row(children: [
       ElevatedButton(
           onPressed: () async {
-            await closeNotice(noticesForDisplay[index].noticeId);
-            setState(() {
-              // futureNoticesForDisplay = fetchNotices();
-            });
+            showDialog(
+                context: context,
+                builder: (BuildContext ctx) {
+                  return AlertDialog(
+                    title: const Text("Please Confirm"),
+                    content: const Text("Close Notice?"),
+                    actions: [
+                      TextButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await closeNotice(
+                                noticesForDisplay[index].noticeId);
+                            setState(() {
+                              futureNoticesForDisplay = fetchNotices();
+                            });
+                          },
+                          child: const Text("Yes")),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('No'))
+                    ],
+                  );
+                });
           },
           child: const Text("Close Notice"))
     ]);
@@ -171,7 +192,7 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
 
   Future<void> closeNotice(String noticeId) async {
     String patchUrl = '${constants.serverURL}/$noticeId';
-    http.patch(Uri.parse(patchUrl));
+    await http.patch(Uri.parse(patchUrl));
   }
 }
 
