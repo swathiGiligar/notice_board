@@ -3,28 +3,51 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:notice_board/constants.dart' as constants;
-import 'package:notice_board/notices/notice_modules.dart';
 import 'package:notice_board/notices/notices.dart';
+import 'package:notice_board/notices/notices_to.dart';
 
-class PlaceNewNotice extends StatefulWidget {
-  const PlaceNewNotice({Key? key}) : super(key: key);
+import '../notices/notice_modules.dart';
+
+class ModifyNotice extends StatefulWidget {
+  final NoticeTransformer noticeToUpdate;
+  const ModifyNotice({Key? key, required this.noticeToUpdate})
+      : super(key: key);
 
   @override
-  State<PlaceNewNotice> createState() => _PlaceNewNoticeState();
+  State<ModifyNotice> createState() => _ModifyNoticeState();
 }
 
-class _PlaceNewNoticeState extends State<PlaceNewNotice> {
+class _ModifyNoticeState extends State<ModifyNotice> {
   final _formKey = GlobalKey<FormState>();
-  String? chosenValue;
   Future<Notice>? _futureNotice;
   bool isButtonPressed = false;
+  late TextEditingController headingController;
+  late TextEditingController priceController;
+  late TextEditingController areaLavel1Controller;
+  late TextEditingController areaLevel2Controller;
+  late TextEditingController contactController;
+  late TextEditingController detailsController;
+  late String chosenValue;
+  late String noticeId;
 
-  final headingController = TextEditingController();
-  final priceController = TextEditingController();
-  final areaLavel1Controller = TextEditingController();
-  final areaLevel2Controller = TextEditingController();
-  final contactController = TextEditingController();
-  final detailsController = TextEditingController();
+  @override
+  void initState() {
+    NoticeTransformer noticeToUpdate = widget.noticeToUpdate;
+    headingController =
+        TextEditingController(text: noticeToUpdate.heading.data);
+    priceController = TextEditingController(text: noticeToUpdate.price.data);
+    areaLavel1Controller =
+        TextEditingController(text: noticeToUpdate.areaLavel1.data);
+    areaLevel2Controller =
+        TextEditingController(text: noticeToUpdate.areaLevel2.data);
+    contactController =
+        TextEditingController(text: noticeToUpdate.contact.data);
+    detailsController =
+        TextEditingController(text: noticeToUpdate.details.data);
+    chosenValue = noticeToUpdate.category.data!;
+    noticeId = noticeToUpdate.noticeId;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -54,7 +77,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
               children: <Widget>[
                 //HEADING
                 TextFormField(
-                  enabled: !isButtonPressed,
+                  // enabled: !isButtonPressed,
                   controller: headingController,
                   decoration: const InputDecoration(
                       hintText: constants.headingHintText,
@@ -70,7 +93,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //PRICE
                 TextFormField(
-                  enabled: !isButtonPressed,
+                  // enabled: !isButtonPressed,
                   controller: priceController,
                   maxLength: constants.priceMaxLength,
                   decoration: const InputDecoration(
@@ -80,8 +103,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //CATEGORY
                 DropdownButton<String>(
-                  disabledHint:
-                      Text(chosenValue ?? constants.categoryDefaultSelection),
+                  disabledHint: Text(chosenValue),
                   value: chosenValue,
                   items: constants.categoryList
                       .map<DropdownMenuItem<String>>((String value) {
@@ -102,7 +124,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //AREA LEVEL 1
                 TextFormField(
-                  enabled: !isButtonPressed,
+                  // enabled: !isButtonPressed,
                   controller: areaLavel1Controller,
                   maxLength: constants.areaLevel1MaxLength,
                   decoration: const InputDecoration(
@@ -118,7 +140,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //AREA LEVEL 2
                 TextFormField(
-                  enabled: !isButtonPressed,
+                  // enabled: !isButtonPressed,
                   controller: areaLevel2Controller,
                   maxLength: constants.areaLevel2MaxLength,
                   decoration: const InputDecoration(
@@ -134,7 +156,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //CONTACT
                 TextFormField(
-                  enabled: !isButtonPressed,
+                  // enabled: !isButtonPressed,
                   controller: contactController,
                   maxLength: constants.contactMaxLength,
                   decoration: const InputDecoration(
@@ -150,7 +172,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
 
                 //DETAILS
                 TextFormField(
-                  enabled: !isButtonPressed,
+                  // enabled: !isButtonPressed,
                   controller: detailsController,
                   maxLength: constants.detailsMaxLength,
                   decoration: const InputDecoration(
@@ -164,26 +186,24 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
                     onPressed: !isButtonPressed
                         ? () {
                             if (_formKey.currentState!.validate()) {
-                              String categoryValue = chosenValue ??
-                                  constants.categoryDefaultSelection;
                               Notice newNotice = Notice(
-                                noticeId: '',
+                                noticeId: noticeId,
                                 heading: headingController.text,
                                 price: priceController.text,
-                                category: categoryValue,
+                                category: chosenValue,
                                 areaLavel1: areaLavel1Controller.text,
                                 areaLevel2: areaLevel2Controller.text,
                                 contact: contactController.text,
                                 details: detailsController.text,
                               );
-                              _futureNotice = createNotice(newNotice);
+                              _futureNotice = updateNotice(newNotice);
                               setState(() {
                                 isButtonPressed = true;
                               });
                             }
                           }
                         : null,
-                    child: const Text('Create'),
+                    child: const Text('Update'),
                   ),
                 ),
                 if (isButtonPressed) buildFutureBuilder(),
@@ -195,27 +215,28 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
     );
   }
 
-  Future<Notice> createNotice(Notice newNotice) async {
-    final response = await http.post(
+  Future<Notice> updateNotice(Notice updatedNotice) async {
+    final response = await http.put(
       Uri.parse(constants.serverURL),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'heading': newNotice.heading,
-        'price': newNotice.price,
-        'category': newNotice.category,
-        'area_level_1': newNotice.areaLavel1,
-        'area_level_2': newNotice.areaLevel2,
-        'contact': newNotice.contact,
-        'details': newNotice.details,
+        'notice_id': updatedNotice.noticeId,
+        'heading': updatedNotice.heading,
+        'price': updatedNotice.price,
+        'category': updatedNotice.category,
+        'area_level_1': updatedNotice.areaLavel1,
+        'area_level_2': updatedNotice.areaLevel2,
+        'contact': updatedNotice.contact,
+        'details': updatedNotice.details,
       }),
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return Notice.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to create Notice.');
+      throw Exception('Failed to update Notice.');
     }
   }
 
@@ -226,7 +247,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
         if (snapshot.hasData) {
           return Column(
             children: [
-              const Text('Notice Created Succcessfully!'),
+              const Text('Notice Updated Succcessfully!'),
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -241,7 +262,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
         } else if (snapshot.hasError) {
           return Column(
             children: [
-              const Text('Notice Creation Failed. Please Try Again'),
+              const Text('Failed to modify notice. Please Try Again'),
               ElevatedButton(
                   onPressed: () {
                     Navigator.push(

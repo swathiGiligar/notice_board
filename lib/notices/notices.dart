@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notice_board/add_notice/add_notice.dart';
+import 'package:notice_board/add_notice/edit_notice.dart';
 import 'package:notice_board/notices/notice_modules.dart';
 import 'package:notice_board/notices/notices_to.dart';
 import 'package:http/http.dart' as http;
@@ -135,36 +136,57 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
 
   Row drawOpButtons(List<NoticeTransformer> noticesForDisplay, int index) {
     return Row(children: [
-      ElevatedButton(
-          onPressed: () async {
-            showDialog(
-                context: context,
-                builder: (BuildContext ctx) {
-                  return AlertDialog(
-                    title: const Text("Please Confirm"),
-                    content: const Text("Close Notice?"),
-                    actions: [
-                      TextButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            await closeNotice(
-                                noticesForDisplay[index].noticeId);
-                            setState(() {
-                              futureNoticesForDisplay = fetchNotices();
-                            });
-                          },
-                          child: const Text("Yes")),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('No'))
-                    ],
-                  );
-                });
-          },
-          child: const Text("Close Notice"))
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+            onPressed: () async {
+              await closeANoticeFlow(noticesForDisplay, index);
+            },
+            child: const Text("Close Notice")),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ModifyNotice(noticeToUpdate: noticesForDisplay[index]),
+                ),
+              );
+            },
+            child: const Text("Modify")),
+      )
     ]);
+  }
+
+  Future<void> closeANoticeFlow(
+      List<NoticeTransformer> noticesForDisplay, int index) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text("Please Confirm"),
+            content: const Text("Close Notice?"),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await closeNotice(noticesForDisplay[index].noticeId);
+                    setState(() {
+                      futureNoticesForDisplay = fetchNotices();
+                    });
+                  },
+                  child: const Text("Yes")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('No'))
+            ],
+          );
+        });
   }
 
   Row drawDetailsRow(List<NoticeTransformer> noticesForDisplay, int index) {
