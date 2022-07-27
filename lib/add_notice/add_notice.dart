@@ -167,15 +167,14 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
                               String categoryValue = chosenValue ??
                                   constants.categoryDefaultSelection;
                               Notice newNotice = Notice(
-                                noticeId: '',
-                                heading: headingController.text,
-                                price: priceController.text,
-                                category: categoryValue,
-                                areaLavel1: areaLavel1Controller.text,
-                                areaLevel2: areaLevel2Controller.text,
-                                contact: contactController.text,
-                                details: detailsController.text,
-                              );
+                                  noticeId: '',
+                                  heading: headingController.text,
+                                  price: priceController.text,
+                                  category: categoryValue,
+                                  areaLevel1: areaLavel1Controller.text,
+                                  areaLevel2: areaLevel2Controller.text,
+                                  contact: contactController.text,
+                                  details: detailsController.text);
                               _futureNotice = createNotice(newNotice);
                               setState(() {
                                 isButtonPressed = true;
@@ -205,7 +204,7 @@ class _PlaceNewNoticeState extends State<PlaceNewNotice> {
         'heading': newNotice.heading,
         'price': newNotice.price,
         'category': newNotice.category,
-        'area_level_1': newNotice.areaLavel1,
+        'area_level_1': newNotice.areaLevel1,
         'area_level_2': newNotice.areaLevel2,
         'contact': newNotice.contact,
         'details': newNotice.details,

@@ -37,7 +37,7 @@ class _ModifyNoticeState extends State<ModifyNotice> {
         TextEditingController(text: noticeToUpdate.heading.data);
     priceController = TextEditingController(text: noticeToUpdate.price.data);
     areaLavel1Controller =
-        TextEditingController(text: noticeToUpdate.areaLavel1.data);
+        TextEditingController(text: noticeToUpdate.areaLevel1.data);
     areaLevel2Controller =
         TextEditingController(text: noticeToUpdate.areaLevel2.data);
     contactController =
@@ -191,7 +191,7 @@ class _ModifyNoticeState extends State<ModifyNotice> {
                                 heading: headingController.text,
                                 price: priceController.text,
                                 category: chosenValue,
-                                areaLavel1: areaLavel1Controller.text,
+                                areaLevel1: areaLavel1Controller.text,
                                 areaLevel2: areaLevel2Controller.text,
                                 contact: contactController.text,
                                 details: detailsController.text,
@@ -226,7 +226,7 @@ class _ModifyNoticeState extends State<ModifyNotice> {
         'heading': updatedNotice.heading,
         'price': updatedNotice.price,
         'category': updatedNotice.category,
-        'area_level_1': updatedNotice.areaLavel1,
+        'area_level_1': updatedNotice.areaLevel1,
         'area_level_2': updatedNotice.areaLevel2,
         'contact': updatedNotice.contact,
         'details': updatedNotice.details,

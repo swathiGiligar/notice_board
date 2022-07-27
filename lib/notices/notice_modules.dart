@@ -8,32 +8,34 @@ class Notice {
   final String heading;
   final String price;
   final String category;
-  final String areaLavel1;
+  final String areaLevel1;
   final String areaLevel2;
   final String contact;
   final String details;
+  final DateTime? createdOn;
 
   const Notice(
       {required this.noticeId,
       required this.heading,
       required this.price,
       required this.category,
-      required this.areaLavel1,
+      required this.areaLevel1,
       required this.areaLevel2,
       required this.contact,
-      required this.details});
+      required this.details,
+      this.createdOn});
 
   factory Notice.fromJson(Map<String, dynamic> json) {
     return Notice(
-      noticeId: json['notice_id'],
-      heading: json['heading'],
-      price: json['price'],
-      category: json['category'],
-      areaLavel1: json['area_level_1'],
-      areaLevel2: json['area_level_2'],
-      contact: json['contact'],
-      details: json['details'],
-    );
+        noticeId: json['notice_id'],
+        heading: json['heading'],
+        price: json['price'],
+        category: json['category'],
+        areaLevel1: json['area_level_1'],
+        areaLevel2: json['area_level_2'],
+        contact: json['contact'],
+        details: json['details'],
+        createdOn: DateTime.parse(json['created_on']));
   }
 }
 

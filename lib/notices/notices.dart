@@ -48,9 +48,11 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     drawHeading(noticesForDisplay, index),
+                    drawAreaRow(noticesForDisplay, index),
                     drawPriceRow(noticesForDisplay, index),
                     drawDetailsRow(noticesForDisplay, index),
                     drawContactInfoRow(noticesForDisplay, index),
+                    drawCreatedOnRow(noticesForDisplay, index),
                     drawOpButtons(noticesForDisplay, index)
                   ],
                 )),
@@ -134,6 +136,16 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
     ]);
   }
 
+  Row drawCreatedOnRow(List<NoticeTransformer> noticesForDisplay, int index) {
+    return Row(children: [
+      const Text(
+        "Notice Created On: ",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      noticesForDisplay[index].createdOn
+    ]);
+  }
+
   Row drawOpButtons(List<NoticeTransformer> noticesForDisplay, int index) {
     return Row(children: [
       Padding(
@@ -209,6 +221,16 @@ class _NoticeBoardHomeState extends State<NoticeBoardHome> {
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       noticesForDisplay[index].price
+    ]);
+  }
+
+  Row drawAreaRow(List<NoticeTransformer> noticesForDisplay, int index) {
+    return Row(children: [
+      const Text(
+        "Area: ",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      noticesForDisplay[index].areaLevel
     ]);
   }
 
