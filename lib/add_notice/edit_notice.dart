@@ -21,6 +21,7 @@ class _ModifyNoticeState extends State<ModifyNotice> {
   final _formKey = GlobalKey<FormState>();
   Future<Notice>? _futureNotice;
   bool isButtonPressed = false;
+  bool isFormModified = false;
   late TextEditingController headingController;
   late TextEditingController priceController;
   late TextEditingController areaLavel1Controller;
@@ -77,12 +78,17 @@ class _ModifyNoticeState extends State<ModifyNotice> {
               children: <Widget>[
                 //HEADING
                 TextFormField(
-                  // enabled: !isButtonPressed,
+                  enabled: !isButtonPressed,
                   controller: headingController,
                   decoration: const InputDecoration(
                       hintText: constants.headingHintText,
                       labelText: constants.headingLabel),
                   maxLength: constants.headingMaxLength,
+                  onChanged: (x) {
+                    setState(() {
+                      isFormModified = true;
+                    });
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return constants.headingNoInputError;
@@ -93,9 +99,14 @@ class _ModifyNoticeState extends State<ModifyNotice> {
 
                 //PRICE
                 TextFormField(
-                  // enabled: !isButtonPressed,
+                  enabled: !isButtonPressed,
                   controller: priceController,
                   maxLength: constants.priceMaxLength,
+                  onChanged: (x) {
+                    setState(() {
+                      isFormModified = true;
+                    });
+                  },
                   decoration: const InputDecoration(
                       hintText: constants.priceHintText,
                       labelText: constants.priceLabel),
@@ -117,6 +128,7 @@ class _ModifyNoticeState extends State<ModifyNotice> {
                       ? (String? newValue) {
                           setState(() {
                             chosenValue = newValue!;
+                            isFormModified = true;
                           });
                         }
                       : null,
@@ -124,9 +136,14 @@ class _ModifyNoticeState extends State<ModifyNotice> {
 
                 //AREA LEVEL 1
                 TextFormField(
-                  // enabled: !isButtonPressed,
+                  enabled: !isButtonPressed,
                   controller: areaLavel1Controller,
                   maxLength: constants.areaLevel1MaxLength,
+                  onChanged: (x) {
+                    setState(() {
+                      isFormModified = true;
+                    });
+                  },
                   decoration: const InputDecoration(
                       hintText: constants.areaLevel1HintText,
                       labelText: constants.areaLavel1Label),
@@ -140,9 +157,14 @@ class _ModifyNoticeState extends State<ModifyNotice> {
 
                 //AREA LEVEL 2
                 TextFormField(
-                  // enabled: !isButtonPressed,
+                  enabled: !isButtonPressed,
                   controller: areaLevel2Controller,
                   maxLength: constants.areaLevel2MaxLength,
+                  onChanged: (x) {
+                    setState(() {
+                      isFormModified = true;
+                    });
+                  },
                   decoration: const InputDecoration(
                       hintText: constants.areaLevel2HintText,
                       labelText: constants.areaLavel2Label),
@@ -156,9 +178,14 @@ class _ModifyNoticeState extends State<ModifyNotice> {
 
                 //CONTACT
                 TextFormField(
-                  // enabled: !isButtonPressed,
+                  enabled: !isButtonPressed,
                   controller: contactController,
                   maxLength: constants.contactMaxLength,
+                  onChanged: (x) {
+                    setState(() {
+                      isFormModified = true;
+                    });
+                  },
                   decoration: const InputDecoration(
                       hintText: constants.contactHintText,
                       labelText: constants.contactLabel),
@@ -172,9 +199,14 @@ class _ModifyNoticeState extends State<ModifyNotice> {
 
                 //DETAILS
                 TextFormField(
-                  // enabled: !isButtonPressed,
+                  enabled: !isButtonPressed,
                   controller: detailsController,
                   maxLength: constants.detailsMaxLength,
+                  onChanged: (x) {
+                    setState(() {
+                      isFormModified = true;
+                    });
+                  },
                   decoration: const InputDecoration(
                       hintText: constants.detailsHintText,
                       labelText: constants.detailsLabel),
@@ -183,7 +215,7 @@ class _ModifyNoticeState extends State<ModifyNotice> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: ElevatedButton(
-                    onPressed: !isButtonPressed
+                    onPressed: (!isButtonPressed && isFormModified)
                         ? () {
                             if (_formKey.currentState!.validate()) {
                               Notice newNotice = Notice(
